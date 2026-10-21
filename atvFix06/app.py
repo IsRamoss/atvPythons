@@ -60,6 +60,7 @@ def graf_hist():
     ax.set_title("Distribuição das idades", fontweight="bold")
     plt.tight_layout()
     plt.show()
+
 def graf_box():
     dados = pd.read_csv('Arquivos/dados_boxplot.csv', encoding="latin1")
     fig, ax = plt.subplots(figsize=(8, 8))
@@ -75,14 +76,18 @@ def graf_box():
 
 def graf_heatmap():
     dados = pd.read_csv('Arquivos/dados_heatmap.csv', encoding="latin1")
+    matriz = dados.pivot(
+        index="dia_semana", columns="horario", values="movimento_clientes"
+    )
+
     fig, ax = plt.subplots(figsize=(8, 8))
 
     sns.heatmap(
-        dados, annot=True, fmt=".2f",
+        matriz, annot=True, fmt=".2f",
         cmap="coolwarm", linewidths=.5, ax=ax
     )
 
-    ax.set_title("Matriz de Correlação Numérica", fontweight="bold")
+    ax.set_title("Matriz de Movimento por Horaro", fontweight="bold")
     plt.tight_layout()
     plt.show()
 
@@ -103,11 +108,43 @@ def graf_setor():
     plt.tight_layout()
     plt.show()
 
-    
+def graf_frequencia():
+    dados = pd.read_csv('Arquivos/dados_frequencia.csv', encoding="latin1")
+    agrupado = dados["tipo_atendimento"].value_counts()
+    valores = agrupado.values
+    categorias = agrupado.index
+    cores = sns.color_palette("Set2")
+    fig, ax = plt.subplots(figsize=(8, 8))
+    rotulos = [f"{categoria} ({qtd})" for categoria, qtd in agrupado.items()]
+
+    ax.pie(
+        valores, labels=rotulos, autopct="%1.1f%%",
+        startangle=90, colors=cores,
+        wedgeprops=dict(width=0.6, edgecolor="white")
+    )
+
+    ax.set_title("Distribuição de Chamados por Categoria", fontweight="bold")
+    plt.tight_layout()
+    plt.show()
+
+def graf_regressao():
+    dados = pd.read_csv('Arquivos/dados_regressao.csv', encoding="latin1")
+    fig, ax = plt.subplots(figsize=(8, 8))
+
+    sns.scatterplot(
+        data=dados, x="renda_mensal", y="gasto_mensal",
+         alpha=0.8, ax=ax
+    )
+    sns.regplot(data=dados, x="renda_mensal", y="gasto_mensal", scatter=False, color="gray", ax=ax)
+
+    ax.set_title("Relação entre Renda Mensal e o Gasto", fontweight="bold")
+    plt.tight_layout()
+    plt.show()
+
 grafico = ""
 while grafico != "0":
     print("Insira o Número do gráfico que você quer rodar:")
-    grafico = input("0-Encerrar\n1-Linhas\n2-Barras\n3-Dispersao\n4-Histograma\nResposta: ")
+    grafico = input("0-Encerrar\n1-Linhas\n2-Barras\n3-Dispersao\n4-Histograma\n5-Boxplot\n6-Heatmap\n7-Setor\n8-Frequencia\n9-Regressao\nResposta: ")
     match grafico:
         case "1":
             graf_linhas()
@@ -123,6 +160,10 @@ while grafico != "0":
             graf_heatmap()
         case "7":
             graf_setor()
+        case "8":
+            graf_frequencia()
+        case "9":
+            graf_regressao()
         case "0":
             print("Encerrando...")
         case _:
